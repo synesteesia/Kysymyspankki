@@ -11,6 +11,11 @@ import spark.utils.StringUtils;
 public class Kysymyspankki {
 
     public static void main(String[] args) throws Exception {
+
+        if (System.getenv("PORT") != null) {
+            Spark.port(Integer.valueOf(System.getenv("PORT")));
+        }
+
         File tiedosto = new File("db", "kysymyspankki.db");
         Database database = new Database("jdbc:sqlite:" + tiedosto.getAbsolutePath());
 
