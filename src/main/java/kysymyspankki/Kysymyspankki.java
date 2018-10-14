@@ -1,4 +1,4 @@
-package fi.amikko.kysymyspankki;
+package kysymyspankki;
 
 import java.io.File;
 import java.util.HashMap;
