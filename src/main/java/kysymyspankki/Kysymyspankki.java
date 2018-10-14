@@ -46,16 +46,48 @@ public class Kysymyspankki {
             HashMap map = new HashMap<>();
             String id = request.params(":id");
 
-            Kysymys kysymys = kysymysDao.findOne(Integer.parseInt(id));
-            List<Vastaus> vastaukset = vastausDao.findByKysymysId(kysymys.getId());
-            kysymys.setVastaukset(vastaukset);
+            int kysymysIdInt;
+            boolean pyyntoOK = true;
 
-            Aihe aihe = aiheDao.findOne(kysymys.getAihe());
-            Kurssi kurssi = kurssiDao.findOne(aihe.getKurssi());
+            try {
+                kysymysIdInt = Integer.parseInt(id);
+                Kysymys kysymys = kysymysDao.findOne(kysymysIdInt);
 
-            map.put("kurssi", kurssi);
-            map.put("aihe", aihe);
-            map.put("kysymys", kysymys);
+                if (kysymys == null) {
+                    pyyntoOK = false;
+                }
+
+                List<Vastaus> vastaukset = vastausDao.findByKysymysId(kysymys.getId());
+                kysymys.setVastaukset(vastaukset);
+
+                Aihe aihe = aiheDao.findOne(kysymys.getAihe());
+                Kurssi kurssi = kurssiDao.findOne(aihe.getKurssi());
+
+                map.put("kurssi", kurssi);
+                map.put("aihe", aihe);
+                map.put("kysymys", kysymys);
+            } catch (NumberFormatException e) {
+
+                System.out.println(e);
+                pyyntoOK = false;
+            }
+
+            if (!pyyntoOK) {
+                List<Kurssi> kurssit = kurssiDao.findAll();
+                for (int i = 0; i < kurssit.size(); i++) {
+                    Kurssi kurssiI = kurssit.get(i);
+                    List<Aihe> aiheetL = aiheDao.findByCourseId(kurssiI.getId());
+                    kurssiI.setAiheet(aiheetL);
+                    for (int ii = 0; ii < aiheetL.size(); ii++) {
+                        Aihe aiheI = aiheetL.get(ii);
+                        List<Kysymys> kysymyksetL = kysymysDao.findByAiheId(aiheI.getId());
+                        aiheI.setKysymykset(kysymyksetL);
+                    }
+                }
+                map.put("kurssit", kurssit);
+
+                return new ModelAndView(map, "index");
+            }
 
             return new ModelAndView(map, "kysymysNakyma");
         }, new ThymeleafTemplateEngine());
@@ -65,6 +97,13 @@ public class Kysymyspankki {
             String teksti = request.queryParams("kysymysteksti");
             String aiheNimi = request.queryParams("aiheNimi");
             String kurssiNimi = request.queryParams("kurssiNimi");
+
+            if (StringUtils.isEmpty(teksti) || StringUtils.isEmpty(aiheNimi)
+                    || StringUtils.isEmpty(kurssiNimi)) {
+
+                response.redirect("/");
+            }
+
             Kurssi kurssi = kurssiDao.findByName(kurssiNimi);
             if (kurssi == null) {
                 kurssi = kurssiDao.create(new Kurssi(kurssiNimi));
@@ -87,9 +126,22 @@ public class Kysymyspankki {
             String oikein = req.queryParams("oikein");
             String kysymysId = req.params(":id");
             boolean oikeinB = StringUtils.isNotEmpty(oikein);
+            int kysymysIdInt;
 
             try {
-                Vastaus uusi = new Vastaus(vastausTeksti, oikeinB, Integer.parseInt(kysymysId));
+                kysymysIdInt = Integer.parseInt(kysymysId);
+            } catch (NumberFormatException e) {
+                System.out.println(e);
+                res.redirect("/");
+                return "";
+            }
+
+            if (StringUtils.isEmpty(vastausTeksti)) {
+                res.redirect("/kysymys/" + kysymysId);
+            }
+
+            try {
+                Vastaus uusi = new Vastaus(vastausTeksti, oikeinB, kysymysIdInt);
 
                 vastausDao.create(uusi);
             } catch (Exception ex) {
