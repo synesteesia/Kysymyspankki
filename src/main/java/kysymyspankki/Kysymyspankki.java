@@ -204,7 +204,7 @@ public class Kysymyspankki {
         PreparedStatement stmt = conn.prepareStatement("CREATE TABLE Kurssi ("
                 + "id integer PRIMARY KEY,"
                 + "nimi varchar(50))");
-        stmt.executeQuery();
+        stmt.executeUpdate();
 
         stmt = conn.prepareStatement("CREATE TABLE Aihe ("
                 + "id integer PRIMARY KEY,"
