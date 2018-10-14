@@ -201,26 +201,27 @@ public class Kysymyspankki {
 
     public static void createTables(Database database) throws Exception {
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("CREATE TABLE Kurssi ("
+        PreparedStatement stmt
+                = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Kurssi ("
                 + "id integer PRIMARY KEY,"
                 + "nimi varchar(50))");
         stmt.executeUpdate();
 
-        stmt = conn.prepareStatement("CREATE TABLE Aihe ("
+        stmt = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Aihe ("
                 + "id integer PRIMARY KEY,"
                 + "nimi varchar(50),"
                 + "kurssi_id integer,"
                 + "FOREIGN KEY (kurssi_id) REFERENCES Kurssi(id))");
         stmt.executeUpdate();
 
-        stmt = conn.prepareStatement("CREATE TABLE Kysymys ("
+        stmt = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Kysymys ("
                 + "id integer PRIMARY KEY,"
                 + "teksti varchar(500),"
                 + "aihe_id integer,"
                 + "FOREIGN KEY (aihe_id) REFERENCES Aihe(id))");
         stmt.executeUpdate();
 
-        stmt = conn.prepareStatement("CREATE TABLE Vastaus ("
+        stmt = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Vastaus ("
                 + "id integer PRIMARY KEY,"
                 + "vastausteksti varchar(200),"
                 + "oikein boolean,"
