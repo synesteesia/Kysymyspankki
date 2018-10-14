@@ -1,6 +1,9 @@
 package kysymyspankki;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.List;
 import spark.ModelAndView;
@@ -192,5 +195,38 @@ public class Kysymyspankki {
             return "";
         });
 
+    }
+
+    public static void createTables(Database database) throws Exception {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("CREATE TABLE Kurssi ("
+                + "id integer PRIMARY KEY,"
+                + "nimi varchar(50))");
+        stmt.executeQuery();
+
+        stmt = conn.prepareStatement("CREATE TABLE Aihe ("
+                + "id integer PRIMARY KEY,"
+                + "nimi varchar(50),"
+                + "kurssi_id integer,"
+                + "FOREIGN KEY (kurssi_id) REFERENCES Kurssi(id))");
+        stmt.executeUpdate();
+
+        stmt = conn.prepareStatement("CREATE TABLE Kysymys ("
+                + "id integer PRIMARY KEY,"
+                + "teksti varchar(500),"
+                + "aihe_id integer,"
+                + "FOREIGN KEY (aihe_id) REFERENCES Aihe(id))");
+        stmt.executeUpdate();
+
+        stmt = conn.prepareStatement("CREATE TABLE Vastaus ("
+                + "id integer PRIMARY KEY,"
+                + "vastausteksti varchar(200),"
+                + "oikein boolean,"
+                + "kysymys_id integer,"
+                + "FOREIGN KEY (kysymys_id) REFERENCES Kysymys(id))");
+        stmt.executeUpdate();
+
+        stmt.close();
+        conn.close();
     }
 }
