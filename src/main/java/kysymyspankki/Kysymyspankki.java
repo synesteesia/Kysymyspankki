@@ -201,28 +201,37 @@ public class Kysymyspankki {
 
     public static void createTables(Database database) throws Exception {
         Connection conn = database.getConnection();
-        PreparedStatement stmt
-                = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Kurssi ("
-                + "id integer PRIMARY KEY,"
+        PreparedStatement stmt = conn.prepareStatement("DROP TABLE Vastaus");
+        stmt.executeUpdate();
+
+        stmt = conn.prepareStatement("DROP TABLE Kysymys");
+        stmt.executeUpdate();
+        stmt = conn.prepareStatement("DROP TABLE Aihe");
+        stmt.executeUpdate();
+        stmt = conn.prepareStatement("DROP TABLE Kurssi");
+        stmt.executeUpdate();
+
+        stmt = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Kurssi ("
+                + "id SERIAL PRIMARY KEY,"
                 + "nimi varchar(50))");
         stmt.executeUpdate();
 
         stmt = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Aihe ("
-                + "id integer PRIMARY KEY,"
+                + "id SERIAL PRIMARY KEY,"
                 + "nimi varchar(50),"
                 + "kurssi_id integer,"
                 + "FOREIGN KEY (kurssi_id) REFERENCES Kurssi(id))");
         stmt.executeUpdate();
 
         stmt = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Kysymys ("
-                + "id integer PRIMARY KEY,"
+                + "id SERIAL PRIMARY KEY,"
                 + "teksti varchar(500),"
                 + "aihe_id integer,"
                 + "FOREIGN KEY (aihe_id) REFERENCES Aihe(id))");
         stmt.executeUpdate();
 
         stmt = conn.prepareStatement("CREATE TABLE IF NOT EXISTS Vastaus ("
-                + "id integer PRIMARY KEY,"
+                + "id SERIAL PRIMARY KEY,"
                 + "vastausteksti varchar(200),"
                 + "oikein boolean,"
                 + "kysymys_id integer,"
