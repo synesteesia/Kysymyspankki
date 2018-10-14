@@ -22,6 +22,8 @@ public class Kysymyspankki {
         File tiedosto = new File("db", "kysymyspankki.db");
         Database database = new Database("jdbc:sqlite:" + tiedosto.getAbsolutePath());
 
+        createTables(database);
+
         KysymysDao kysymysDao = new KysymysDao(database);
         KurssiDao kurssiDao = new KurssiDao(database);
         AiheDao aiheDao = new AiheDao(database);
